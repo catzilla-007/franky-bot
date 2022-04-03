@@ -1,35 +1,20 @@
 
 #include <ArduinoJson.h>
 
-String message = "";
-bool messageReady = false;
-
 void setup() {
   Serial.begin(9600);
 }
 
 void loop() {
-  while(Serial.available()) {
-    message = Serial.readString();
-    messageReady = true;
-  }
+  DynamicJsonDocument doc(1024);
 
-  if(messageReady) {
-    DynamicJsonDocument doc(1024); 
+  doc["type"] = "sensors";
 
-    DeserializationError error = deserializeJson(doc,message);
-    if(error) {
-      Serial.print(F("deserializeJson() failed: "));
-      Serial.println(error.c_str());
-      messageReady = false;
-      return;
-    }
-    if(doc["type"] == "request") {
-      doc["type"] = "response";
-      doc["distance"] = "100";
-      doc["gas"] = "100";
-      serializeJson(doc,Serial);
-    }
-    messageReady = false;
-  }
+  doc["temperature"] = "40";
+
+  doc["humidity"] = "70%";
+
+  serializeJson(doc, Serial);
+
+  delay(2000);
 }
